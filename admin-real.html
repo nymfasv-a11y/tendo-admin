@@ -268,6 +268,17 @@
 </head>
 <body>
 
+  <div id="adminLoginOverlay" style="position:fixed;inset:0;background:#0d0a14;z-index:999;display:flex;align-items:center;justify-content:center">
+    <div style="width:320px;text-align:center">
+      <div style="font-size:32px;margin-bottom:16px">💜</div>
+      <div style="font-weight:800;font-size:18px;margin-bottom:6px">TENDO ADMIN</div>
+      <div style="color:var(--text-faint);font-size:13px;margin-bottom:20px">Введи пароль администратора</div>
+      <input type="password" id="adminPasswordInput" placeholder="Пароль" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-size:14px;margin-bottom:12px" onkeydown="if(event.key==='Enter') adminLogin()" />
+      <button onclick="adminLogin()" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--purple),var(--wave));color:white;font-weight:700;cursor:pointer">Войти</button>
+      <div id="adminLoginError" style="color:#e2504a;font-size:12px;margin-top:10px;display:none">Неверный пароль</div>
+    </div>
+  </div>
+
   <div class="global-refresh" id="globalRefreshBtn" onclick="refreshData()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
     <span data-i18n="refresh">Обновить</span>
@@ -331,25 +342,26 @@
     <div class="metrics">
       <div class="metric-card" style="--accent-glow: rgba(139,110,240,0.15)">
         <div class="metric-label">Пользователи</div>
-        <div class="metric-value">3 842</div>
-        <div class="metric-delta up">↑ 214 за неделю</div>
+        <div class="metric-value" id="metricUsers">—</div>
+        <div class="metric-delta" id="metricUsersDelta"></div>
       </div>
       <div class="metric-card" style="--accent-glow: rgba(239,95,146,0.15)">
         <div class="metric-label">Активные круги</div>
-        <div class="metric-value">2 910</div>
-        <div class="metric-delta up">↑ 6.4%</div>
+        <div class="metric-value" id="metricCircles">—</div>
+        <div class="metric-delta" id="metricCirclesDelta"></div>
       </div>
       <div class="metric-card" style="--accent-glow: rgba(240,169,78,0.15)">
-        <div class="metric-label">Premium</div>
-        <div class="metric-value">486</div>
-        <div class="metric-delta up">↑ 31 подписка</div>
+        <div class="metric-label">Людей в кругах</div>
+        <div class="metric-value" id="metricCirclePeople">—</div>
+        <div class="metric-delta" id="metricCirclePeopleDelta"></div>
       </div>
       <div class="metric-card" style="--accent-glow: rgba(90,200,140,0.15)">
         <div class="metric-label">Wave сегодня</div>
-        <div class="metric-value">1 205</div>
-        <div class="metric-delta down">↓ 3.1% ко вчера</div>
+        <div class="metric-value" id="metricWave">—</div>
+        <div class="metric-delta" id="metricWaveDelta"></div>
       </div>
     </div>
+    <div id="adminStatusBanner" style="display:none;margin-top:16px;padding:14px 18px;border-radius:12px;background:rgba(226,75,74,0.12);border:1px solid rgba(226,75,74,0.3);color:#e2504a;font-size:13px"></div>
 
     <div class="grid-2">
       <div class="panel">
@@ -507,67 +519,20 @@
   <!-- ===== PAGE: SUPPORT ===== -->
   <div class="page" id="page-support">
     <div class="main-head">
-      <div><h1>Поддержка</h1><div class="sub">7 новых обращений ждут ответа</div></div>
+      <div><h1>Поддержка</h1><div class="sub" id="supportCountSub">Загрузка…</div></div>
     </div>
     <div class="filter-tabs">
-      <div class="filter-tab active">Все<span class="count">14</span></div>
-      <div class="filter-tab">Новые<span class="count">7</span></div>
-      <div class="filter-tab">В работе<span class="count">3</span></div>
-      <div class="filter-tab">Решено<span class="count">4</span></div>
+      <div class="filter-tab active" data-filter="all" onclick="setSupportFilter('all')">Все<span class="count" id="countAll">0</span></div>
+      <div class="filter-tab" data-filter="new" onclick="setSupportFilter('new')">Новые<span class="count" id="countNew">0</span></div>
+      <div class="filter-tab" data-filter="in_progress" onclick="setSupportFilter('in_progress')">В работе<span class="count" id="countInProgress">0</span></div>
+      <div class="filter-tab" data-filter="resolved" onclick="setSupportFilter('resolved')">Решено<span class="count" id="countResolved">0</span></div>
     </div>
     <div class="ticket-layout">
-      <div class="ticket-list">
-        <div class="ticket-row selected">
-          <div class="list-avatar">А</div>
-          <div class="list-body">
-            <div class="list-title">Александр М. <span class="time">12 мин</span></div>
-            <div class="list-sub">Не приходят уведомления о днях рождения...</div>
-          </div>
-        </div>
-        <div class="ticket-row">
-          <div class="list-avatar" style="background:linear-gradient(135deg,#f0a94e,#d97757)">Е</div>
-          <div class="list-body">
-            <div class="list-title">Елена К. <span class="time">1 ч</span></div>
-            <div class="list-sub">Как удалить человека из круга полностью...</div>
-          </div>
-        </div>
-        <div class="ticket-row">
-          <div class="list-avatar" style="background:linear-gradient(135deg,#8fa0ac,#4c5b66)">Р</div>
-          <div class="list-body">
-            <div class="list-title">Роман П. <span class="time">4 ч</span></div>
-            <div class="list-sub">Wave не сохраняется после закрытия приложения</div>
-          </div>
-        </div>
-        <div class="ticket-row">
-          <div class="list-avatar" style="background:linear-gradient(135deg,#8c96f0,#4f5591)">Н</div>
-          <div class="list-body">
-            <div class="list-title">Наталья Ф. <span class="time">6 ч</span></div>
-            <div class="list-sub">Как перенести круг на новый телефон?</div>
-          </div>
-        </div>
-        <div class="ticket-row">
-          <div class="list-avatar" style="background:linear-gradient(135deg,#5ac88c,#2f8f5f)">Д</div>
-          <div class="list-body">
-            <div class="list-title">Дмитрий В. <span class="time">вчера</span></div>
-            <div class="list-sub">Спасибо, разобрался с настройкой приватности сам</div>
-          </div>
-        </div>
+      <div class="ticket-list" id="ticketList">
+        <div style="padding:24px;text-align:center;color:var(--text-faint)">Загрузка обращений…</div>
       </div>
-      <div class="ticket-detail">
-        <div class="ticket-detail-head">
-          <div>
-            <div class="name">Александр М.</div>
-            <div class="meta">alexandr.m@gmail.com · Круг: 6 человек · Premium</div>
-          </div>
-          <span class="status-chip new">Новое</span>
-        </div>
-        <div class="bubble">Здравствуйте! Не приходят уведомления о днях рождения, хотя время выбрано верно (09:00). Проверял настройки телефона — разрешения выданы. В последний раз пропустил день рождения мамы из-за этого 😔</div>
-        <div class="bubble admin">Здравствуйте, Александр! Спасибо, что написали — очень жаль, что так вышло. Уточните, пожалуйста, какая версия приложения и ОС на телефоне? Проверим на нашей стороне в первую очередь.</div>
-        <div class="bubble">iPhone 14, iOS 18.1, версия приложения 1.2.0</div>
-        <div class="reply-box">
-          <textarea placeholder="Написать ответ..."></textarea>
-          <button class="send-btn">Отправить</button>
-        </div>
+      <div class="ticket-detail" id="ticketDetail">
+        <div style="padding:40px 24px;text-align:center;color:var(--text-faint)">Выбери обращение слева</div>
       </div>
     </div>
   </div>
@@ -575,170 +540,45 @@
   <!-- ===== PAGE: SUGGESTIONS ===== -->
   <div class="page" id="page-suggestions">
     <div class="main-head">
-      <div><h1>Предложения</h1><div class="sub">Идеи от пользователей — банк вопросов и функций на будущее</div></div>
+      <div><h1>Предложения</h1><div class="sub" id="suggestionsCountSub">Идеи от пользователей — банк вопросов и функций на будущее</div></div>
     </div>
-    <div class="filter-tabs">
-      <div class="filter-tab active">Новые<span class="count">12</span></div>
-      <div class="filter-tab">В планах</div>
-      <div class="filter-tab">Реализовано</div>
-      <div class="filter-tab">Отклонено</div>
-    </div>
-
-    <div class="suggest-card">
-      <div class="vote-box"><div class="n">34</div><div class="l">голоса</div></div>
-      <div class="suggest-body">
-        <div class="top"><span class="author">Мария П.</span><span class="time">3 ч назад</span></div>
-        <div class="text">Было бы здорово, если бы Tendo спрашивал про любимую музыку — для подарков-плейлистов на день рождения.</div>
-        <div class="suggest-tags"><span class="stag">Wave</span><span class="stag">Подарки</span></div>
-      </div>
-    </div>
-    <div class="suggest-card">
-      <div class="vote-box"><div class="n">21</div><div class="l">голоса</div></div>
-      <div class="suggest-body">
-        <div class="top"><span class="author">Руслан Т.</span><span class="time">вчера</span></div>
-        <div class="text">Добавьте напоминание не только о дне рождения, но и о годовщине свадьбы родителей — важная дата, которую тоже легко забыть.</div>
-        <div class="suggest-tags"><span class="stag">Даты</span></div>
-      </div>
-    </div>
-    <div class="suggest-card">
-      <div class="vote-box"><div class="n">17</div><div class="l">голоса</div></div>
-      <div class="suggest-body">
-        <div class="top"><span class="author">Ирина С.</span><span class="time">2 дня назад</span></div>
-        <div class="text">Хочу видеть общий Wish List по всем людям сразу, не заходя в каждого отдельно — было бы удобно перед праздниками.</div>
-        <div class="suggest-tags"><span class="stag">Wish List</span><span class="stag">UX</span></div>
-      </div>
-    </div>
-    <div class="suggest-card">
-      <div class="vote-box"><div class="n">9</div><div class="l">голоса</div></div>
-      <div class="suggest-body">
-        <div class="top"><span class="author">Виктор Л.</span><span class="time">3 дня назад</span></div>
-        <div class="text">Можно ли сделать тёмную/светлую тему на выбор? Сейчас только тёмная, иногда неудобно при ярком солнце.</div>
-        <div class="suggest-tags"><span class="stag">Дизайн</span></div>
-      </div>
+    <div id="suggestionsList">
+      <div style="padding:24px;text-align:center;color:var(--text-faint)">Загрузка предложений…</div>
     </div>
   </div>
 
+  <!-- ===== PAGE: SUBSCRIPTIONS ===== -->
   <!-- ===== PAGE: SUBSCRIPTIONS ===== -->
   <div class="page" id="page-subscriptions">
     <div class="main-head">
       <div><h1>Подписки</h1><div class="sub">Управление тарифами пользователей</div></div>
     </div>
-    <div class="sub-stats">
-      <div class="sub-stat"><div class="v">486</div><div class="l">Активных Premium</div></div>
-      <div class="sub-stat"><div class="v">$2,430</div><div class="l">MRR (в месяц)</div></div>
-      <div class="sub-stat"><div class="v">12.6%</div><div class="l">Конверсия Free → Premium</div></div>
-      <div class="sub-stat"><div class="v">3.1%</div><div class="l">Отток за месяц</div></div>
-    </div>
-    <div class="search-bar">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input placeholder="Поиск по имени или email..." />
-    </div>
-    <div class="panel table-panel">
-      <table>
-        <thead>
-          <tr><th>Пользователь</th><th>Тариф</th><th>Людей в круге</th><th>Дата оформления</th><th>Следующее списание</th><th>Статус</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#e8a6c2,#a3486f)"></div>Ольга Н.</div></td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>14</td>
-            <td>13 авг 2026</td>
-            <td>13 сен 2026</td>
-            <td style="color:var(--green)">Активна</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#9aada0,#4d5f52)"></div>Виктор Л.</div></td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>9</td>
-            <td>12 авг 2026</td>
-            <td>12 сен 2026</td>
-            <td style="color:var(--green)">Активна</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#c9a582,#7a5636)"></div>Наталья Ф.</div></td>
-            <td><span class="plan-chip free">Бесплатно</span></td>
-            <td>5</td>
-            <td>—</td>
-            <td>—</td>
-            <td style="color:var(--text-faint)">Лимит достигнут</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#8fa0ac,#4f7186)"></div>Сергей К.</div></td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>21</td>
-            <td>10 авг 2026</td>
-            <td>10 сен 2026</td>
-            <td style="color:var(--green)">Активна</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#8c96f0,#4f5591)"></div>Ирина С.</div></td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>7</td>
-            <td>28 июл 2026</td>
-            <td>28 авг 2026</td>
-            <td style="color:var(--wave)">Отменена</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="panel" style="padding:40px 24px;text-align:center">
+      <div style="font-size:32px;margin-bottom:12px">💳</div>
+      <div style="font-weight:700;margin-bottom:8px">Платежи ещё не подключены</div>
+      <div style="color:var(--text-faint);font-size:13px;max-width:420px;margin:0 auto">
+        Сейчас Premium бесплатно для всех (см. Настройки). Когда включим настоящую монетизацию через App Store / Google Play Billing, здесь появятся реальные данные о подписках.
+      </div>
     </div>
   </div>
+
 
   <!-- ===== PAGE: USERS ===== -->
   <div class="page" id="page-users">
     <div class="main-head">
-      <div><h1>Пользователи</h1><div class="sub">3 842 пользователя · согласие с политикой конфиденциальности отслеживается для каждого</div></div>
+      <div><h1>Пользователи</h1><div class="sub" id="usersCountSub">Загрузка… · согласие с политикой конфиденциальности отслеживается для каждого</div></div>
     </div>
     <div class="search-bar">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input placeholder="Поиск по имени или email..." />
+      <input placeholder="Поиск по имени или email..." id="usersSearchInput" oninput="renderUsersTable()" />
     </div>
     <div class="panel table-panel">
       <table>
         <thead>
-          <tr><th>Пользователь</th><th>Способ входа</th><th>Дата регистрации</th><th>Согласие получено</th><th>Тариф</th><th>Язык</th></tr>
+          <tr><th>Пользователь</th><th>Способ входа</th><th>Дата регистрации</th><th>Согласие получено</th><th>Язык</th></tr>
         </thead>
-        <tbody>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#e8a6c2,#a3486f)"></div>Ольга Н.</div></td>
-            <td>Google</td>
-            <td>13 авг 2026, 14:02</td>
-            <td style="color:var(--green)">✓ 13 авг 2026, 14:02</td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>Русский</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#9aada0,#4d5f52)"></div>Виктор Л.</div></td>
-            <td>Google</td>
-            <td>12 авг 2026, 09:41</td>
-            <td style="color:var(--green)">✓ 12 авг 2026, 09:41</td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>Українська</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#c9a582,#7a5636)"></div>Наталья Ф.</div></td>
-            <td style="color:var(--text-faint)">Без входа (локально)</td>
-            <td>11 авг 2026, 20:15</td>
-            <td style="color:var(--green)">✓ 11 авг 2026, 20:15</td>
-            <td><span class="plan-chip free">Бесплатно</span></td>
-            <td>Русский</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#8fa0ac,#4f7186)"></div>Сергей К.</div></td>
-            <td>Google</td>
-            <td>10 авг 2026, 11:30</td>
-            <td style="color:var(--green)">✓ 10 авг 2026, 11:30</td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>English</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#8c96f0,#4f5591)"></div>Ирина С.</div></td>
-            <td style="color:var(--text-faint)">Без входа (локально)</td>
-            <td>28 июл 2026, 18:47</td>
-            <td style="color:var(--green)">✓ 28 июл 2026, 18:47</td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>Română</td>
-          </tr>
+        <tbody id="usersTableBody">
+          <tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px">Загрузка данных с сервера…</td></tr>
         </tbody>
       </table>
     </div>
@@ -783,6 +623,200 @@
   </main>
 
 <script>
+  const API_BASE_URL = 'https://tendo-server-production.up.railway.app';
+  let adminPassword = sessionStorage.getItem('tendo_admin_password') || '';
+  let allSupportTickets = [];
+  let currentSupportFilter = 'all';
+
+  async function adminApiFetch(path, options = {}) {
+    const headers = { 'Content-Type': 'application/json', 'x-admin-password': adminPassword, ...(options.headers || {}) };
+    const res = await fetch(API_BASE_URL + path, { ...options, headers });
+    if (res.status === 403) throw new Error('forbidden');
+    if (!res.ok) throw new Error('API error ' + res.status);
+    return res.json();
+  }
+
+  async function adminLogin() {
+    const input = document.getElementById('adminPasswordInput');
+    adminPassword = input.value;
+    const errorEl = document.getElementById('adminLoginError');
+    try {
+      await adminApiFetch('/admin/dashboard');
+      sessionStorage.setItem('tendo_admin_password', adminPassword);
+      document.getElementById('adminLoginOverlay').style.display = 'none';
+      loadAllAdminData();
+    } catch (err) {
+      errorEl.style.display = 'block';
+    }
+  }
+
+  function formatDateTime(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso.replace(' ', 'T') + 'Z');
+    return d.toLocaleString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function loadDashboard() {
+    try {
+      const data = await adminApiFetch('/admin/dashboard');
+      document.getElementById('metricUsers').textContent = data.totalUsers;
+      document.getElementById('metricCircles').textContent = data.totalCircles;
+      document.getElementById('metricCirclePeople').textContent = data.totalCirclePeople;
+      document.getElementById('metricWave').textContent = data.waveToday;
+      const langLine = data.languages.map(l => l.language + ': ' + l.c).join(' · ');
+      document.getElementById('metricUsersDelta').textContent = langLine || '';
+    } catch (err) {
+      console.warn('Не удалось загрузить дашборд:', err.message);
+    }
+  }
+
+  let allUsers = [];
+  async function loadUsers() {
+    try {
+      const data = await adminApiFetch('/admin/users');
+      allUsers = data.users;
+      document.getElementById('usersCountSub').textContent = allUsers.length + ' пользователей · согласие с политикой отслеживается для каждого';
+      renderUsersTable();
+    } catch (err) {
+      document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px">Не удалось загрузить</td></tr>';
+    }
+  }
+
+  function renderUsersTable() {
+    const search = (document.getElementById('usersSearchInput')?.value || '').toLowerCase();
+    const filtered = allUsers.filter(u => (u.name || '').toLowerCase().includes(search) || (u.email || '').toLowerCase().includes(search));
+    const body = document.getElementById('usersTableBody');
+    if (filtered.length === 0) {
+      body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px">Никого не найдено</td></tr>';
+      return;
+    }
+    body.innerHTML = filtered.map(u => `
+      <tr>
+        <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#8c96f0,#4f5591)">${(u.name||'?')[0]}</div>${escapeHtmlAdmin(u.name || '—')}</div></td>
+        <td>${u.google_id ? 'Google' : 'Без входа (локально)'}</td>
+        <td>${formatDateTime(u.created_at)}</td>
+        <td style="${u.consent_given_at ? 'color:var(--green)' : 'color:var(--text-faint)'}">${u.consent_given_at ? '✓ ' + formatDateTime(u.consent_given_at) : '— нет'}</td>
+        <td>${u.language || '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  function escapeHtmlAdmin(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  async function loadSupportTickets() {
+    try {
+      const data = await adminApiFetch('/admin/support-tickets');
+      allSupportTickets = data.tickets;
+      renderSupportCounts();
+      renderTicketList();
+    } catch (err) {
+      document.getElementById('ticketList').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-faint)">Не удалось загрузить</div>';
+    }
+  }
+
+  function renderSupportCounts() {
+    document.getElementById('countAll').textContent = allSupportTickets.length;
+    document.getElementById('countNew').textContent = allSupportTickets.filter(t => t.status === 'new').length;
+    document.getElementById('countInProgress').textContent = allSupportTickets.filter(t => t.status === 'in_progress').length;
+    document.getElementById('countResolved').textContent = allSupportTickets.filter(t => t.status === 'resolved').length;
+    const newCount = allSupportTickets.filter(t => t.status === 'new').length;
+    document.getElementById('supportCountSub').textContent = newCount + ' новых обращений ждут ответа';
+    document.querySelector('[data-page="support"] .badge').textContent = newCount;
+  }
+
+  function setSupportFilter(filter) {
+    currentSupportFilter = filter;
+    document.querySelectorAll('#page-support .filter-tab').forEach(t => t.classList.toggle('active', t.dataset.filter === filter));
+    renderTicketList();
+  }
+
+  function renderTicketList() {
+    const filtered = currentSupportFilter === 'all' ? allSupportTickets : allSupportTickets.filter(t => t.status === currentSupportFilter);
+    const list = document.getElementById('ticketList');
+    if (filtered.length === 0) {
+      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-faint)">Нет обращений</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(t => `
+      <div class="ticket-row" onclick="openTicketDetail('${t.id}')">
+        <div class="list-avatar">${t.status === 'new' ? '🆕' : t.status === 'in_progress' ? '⏳' : '✓'}</div>
+        <div class="list-body">
+          <div class="list-title">${formatDateTime(t.created_at)}</div>
+          <div class="list-sub">${escapeHtmlAdmin((t.message || '').slice(0, 60))}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openTicketDetail(id) {
+    const t = allSupportTickets.find(x => x.id === id);
+    if (!t) return;
+    const statusLabels = { new: 'Новое', in_progress: 'В работе', resolved: 'Решено' };
+    document.getElementById('ticketDetail').innerHTML = `
+      <div class="ticket-detail-head">
+        <div><div class="name">Обращение</div><div class="meta">${formatDateTime(t.created_at)}</div></div>
+        <span class="status-chip ${t.status}">${statusLabels[t.status]}</span>
+      </div>
+      <div class="bubble">${escapeHtmlAdmin(t.message)}</div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="send-btn" onclick="updateTicketStatus('${t.id}','in_progress')">В работу</button>
+        <button class="send-btn" onclick="updateTicketStatus('${t.id}','resolved')">Решено</button>
+      </div>
+    `;
+  }
+
+  async function updateTicketStatus(id, status) {
+    try {
+      await adminApiFetch('/admin/support-tickets/' + id, { method: 'PUT', body: JSON.stringify({ status }) });
+      await loadSupportTickets();
+      openTicketDetail(id);
+    } catch (err) {
+      console.warn('Не удалось обновить статус:', err.message);
+    }
+  }
+
+  async function loadSuggestions() {
+    try {
+      const data = await adminApiFetch('/admin/suggestions');
+      const list = document.getElementById('suggestionsList');
+      document.getElementById('suggestionsCountSub').textContent = data.suggestions.length + ' предложений от пользователей';
+      if (data.suggestions.length === 0) {
+        list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-faint)">Пока нет предложений</div>';
+        return;
+      }
+      list.innerHTML = data.suggestions.map(s => `
+        <div class="suggest-card">
+          <div class="vote-box"><div class="n">${s.votes}</div><div class="l">голоса</div></div>
+          <div class="suggest-body">
+            <div class="top"><span class="author">${escapeHtmlAdmin(s.user_name || 'Аноним')}</span><span class="time">${formatDateTime(s.created_at)}</span></div>
+            <div class="text">${escapeHtmlAdmin(s.text)}</div>
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      console.warn('Не удалось загрузить предложения:', err.message);
+    }
+  }
+
+  async function loadAllAdminData() {
+    await Promise.all([loadDashboard(), loadUsers(), loadSupportTickets(), loadSuggestions()]);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (adminPassword) {
+      adminApiFetch('/admin/dashboard').then(() => {
+        document.getElementById('adminLoginOverlay').style.display = 'none';
+        loadAllAdminData();
+      }).catch(() => {
+        sessionStorage.removeItem('tendo_admin_password');
+      });
+    }
+  });
+
   function showPage(name) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-' + name).classList.add('active');
@@ -794,33 +828,25 @@
     const label = document.getElementById('lastUpdatedLabel');
     btn.classList.add('spinning');
     label.textContent = '· обновляем...';
-    setTimeout(() => {
+    loadAllAdminData().finally(() => {
       btn.classList.remove('spinning');
       label.textContent = '· обновлено только что';
-    }, 700);
+    });
   }
 
-  function toggleMonetization() {
+  async function toggleMonetization() {
     const checked = document.getElementById('monetizationToggle').checked;
     const pill = document.getElementById('monetizationStatus');
     const text = document.getElementById('monetizationStatusText');
     pill.classList.toggle('on', checked);
     pill.classList.toggle('off', !checked);
     text.textContent = checked ? 'Активно для всех' : 'Выключено — действует лимит 5 человек';
+    try {
+      await adminApiFetch('/admin/settings/premium_free_for_all', { method: 'PUT', body: JSON.stringify({ value: checked }) });
+    } catch (err) {
+      console.warn('Не удалось сохранить настройку на сервере:', err.message);
+    }
   }
-  document.querySelectorAll('.ticket-row').forEach(row => {
-    row.addEventListener('click', () => {
-      document.querySelectorAll('.ticket-row').forEach(r => r.classList.remove('selected'));
-      row.classList.add('selected');
-    });
-  });
-  document.querySelectorAll('.filter-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const parent = tab.parentElement;
-      parent.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-    });
-  });
 </script>
 </body>
 </html>
