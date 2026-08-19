@@ -372,49 +372,18 @@
         <div class="orbit-viz">
           <div class="orbit-ring-el" style="width:170px;height:170px"></div>
           <div class="orbit-ring-el" style="width:110px;height:110px"></div>
-          <div class="orbit-center"><div class="num">2.9K</div><div class="lbl">кругов</div></div>
-          <div class="orbit-dot" style="top:14px; left:50%; margin-left:-4px; background:var(--wave); color:var(--wave)"></div>
-          <div class="orbit-dot" style="top:44px; right:22px; background:var(--wave); color:var(--wave)"></div>
-          <div class="orbit-dot" style="bottom:38px; right:14px; background:var(--priority); color:var(--priority)"></div>
-          <div class="orbit-dot" style="bottom:12px; left:38%; background:#8fa0ac; color:#8fa0ac"></div>
-          <div class="orbit-dot" style="top:50%; left:8px; background:#8fa0ac; color:#8fa0ac"></div>
-          <div class="orbit-dot" style="top:36px; left:26px; background:var(--priority); color:var(--priority)"></div>
+          <div class="orbit-center"><div class="num" id="orbitCirclesNum">—</div><div class="lbl">кругов</div></div>
         </div>
-        <div class="legend-row">
-          <div class="lg"><div class="dot" style="background:var(--wave)"></div>С активной Wave</div>
-          <div class="lg"><div class="dot" style="background:var(--priority)"></div>С приоритетными</div>
-          <div class="lg"><div class="dot" style="background:#8fa0ac"></div>Остальные</div>
-        </div>
+        <div class="empty-advice" style="text-align:left;padding-top:10px;font-size:11.5px">Разбивка по типу активности (Wave, приоритетные) появится, когда накопится больше данных.</div>
       </div>
 
       <div class="panel">
         <div class="panel-head">
           <h3>Новые обращения</h3>
-          <span class="link">Все 7 →</span>
+          <span class="link">Все →</span>
         </div>
-        <div class="list-row">
-          <div class="list-avatar">А</div>
-          <div class="list-body">
-            <div class="list-title">Александр М. <span class="time">12 мин назад</span></div>
-            <div class="list-sub">Не приходят уведомления о днях рождения, хотя время выбрано верно</div>
-          </div>
-          <span class="status-chip new">Новое</span>
-        </div>
-        <div class="list-row">
-          <div class="list-avatar">Е</div>
-          <div class="list-body">
-            <div class="list-title">Елена К. <span class="time">1 ч назад</span></div>
-            <div class="list-sub">Как удалить человека из круга полностью, а не архивировать?</div>
-          </div>
-          <span class="status-chip new">Новое</span>
-        </div>
-        <div class="list-row">
-          <div class="list-avatar">Д</div>
-          <div class="list-body">
-            <div class="list-title">Дмитрий В. <span class="time">вчера</span></div>
-            <div class="list-sub">Спасибо, разобрался с настройкой приватности сам</div>
-          </div>
-          <span class="status-chip done">Решено</span>
+        <div id="dashboardTicketsPreview">
+          <div class="empty-advice" style="text-align:left">Загрузка…</div>
         </div>
       </div>
     </div>
@@ -423,28 +392,10 @@
       <div class="panel">
         <div class="panel-head">
           <h3>Свежие предложения</h3>
-          <span class="link">Все 12 →</span>
+          <span class="link">Все →</span>
         </div>
-        <div class="list-row">
-          <div class="list-avatar" style="background:linear-gradient(135deg,#f0a94e,#d97757)">М</div>
-          <div class="list-body">
-            <div class="list-title">Мария П. <span class="time">3 ч назад</span></div>
-            <div class="list-sub">Было бы здорово, если бы Tendo спрашивал про любимую музыку — для подарков-плейлистов</div>
-          </div>
-        </div>
-        <div class="list-row">
-          <div class="list-avatar" style="background:linear-gradient(135deg,#5ac88c,#2f8f5f)">Р</div>
-          <div class="list-body">
-            <div class="list-title">Руслан Т. <span class="time">вчера</span></div>
-            <div class="list-sub">Добавьте напоминание не только о дне рождения, но и о годовщине свадьбы родителей</div>
-          </div>
-        </div>
-        <div class="list-row">
-          <div class="list-avatar" style="background:linear-gradient(135deg,#8c96f0,#4f5591)">И</div>
-          <div class="list-body">
-            <div class="list-title">Ирина С. <span class="time">2 дня назад</span></div>
-            <div class="list-sub">Хочу видеть общий Wish List по всем людям сразу, не заходя в каждого</div>
-          </div>
+        <div id="dashboardSuggestionsPreview">
+          <div class="empty-advice" style="text-align:left">Загрузка…</div>
         </div>
       </div>
 
@@ -452,23 +403,8 @@
         <div class="panel-head">
           <h3>Языки пользователей</h3>
         </div>
-        <div style="display:flex; flex-direction:column; gap:14px; padding-top:4px">
-          <div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Русский</span><span style="color:var(--text-faint)">68%</span></div>
-            <div style="height:6px;border-radius:4px;background:rgba(255,255,255,0.06)"><div style="width:68%;height:100%;border-radius:4px;background:var(--wave)"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Українська</span><span style="color:var(--text-faint)">19%</span></div>
-            <div style="height:6px;border-radius:4px;background:rgba(255,255,255,0.06)"><div style="width:19%;height:100%;border-radius:4px;background:var(--priority)"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>English</span><span style="color:var(--text-faint)">9%</span></div>
-            <div style="height:6px;border-radius:4px;background:rgba(255,255,255,0.06)"><div style="width:9%;height:100%;border-radius:4px;background:var(--purple)"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Română</span><span style="color:var(--text-faint)">4%</span></div>
-            <div style="height:6px;border-radius:4px;background:rgba(255,255,255,0.06)"><div style="width:4%;height:100%;border-radius:4px;background:var(--green)"></div></div>
-          </div>
+        <div id="languagesChart" style="display:flex; flex-direction:column; gap:14px; padding-top:4px">
+          <div class="empty-advice" style="text-align:left">Загрузка…</div>
         </div>
       </div>
     </div>
@@ -478,41 +414,9 @@
         <h3>Последние подписки Premium</h3>
         <span class="link">Все подписки →</span>
       </div>
-      <table>
-        <thead>
-          <tr><th>Пользователь</th><th>Тариф</th><th>Людей в круге</th><th>Дата оформления</th><th>Статус</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#e8a6c2,#a3486f)"></div>Ольга Н.</div></td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>14</td>
-            <td>13 авг 2026</td>
-            <td style="color:var(--green)">Активна</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#9aada0,#4d5f52)"></div>Виктор Л.</div></td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>9</td>
-            <td>12 авг 2026</td>
-            <td style="color:var(--green)">Активна</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#c9a582,#7a5636)"></div>Наталья Ф.</div></td>
-            <td><span class="plan-chip free">Бесплатно</span></td>
-            <td>5</td>
-            <td>—</td>
-            <td style="color:var(--text-faint)">Лимит достигнут</td>
-          </tr>
-          <tr>
-            <td><div class="mini-name"><div class="mini-avatar" style="background:linear-gradient(135deg,#8fa0ac,#4f7186)"></div>Сергей К.</div></td>
-            <td><span class="plan-chip premium">Premium</span></td>
-            <td>21</td>
-            <td>10 авг 2026</td>
-            <td style="color:var(--green)">Активна</td>
-          </tr>
-        </tbody>
-      </table>
+      <div style="padding:20px 4px;text-align:center;color:var(--text-faint);font-size:12.5px">
+        Платежи ещё не подключены — сейчас Premium бесплатно для всех (см. Настройки). Здесь появятся реальные подписки, когда включим монетизацию.
+      </div>
     </div>
   </div>
 
@@ -663,10 +567,77 @@
       document.getElementById('metricCircles').textContent = data.totalCircles;
       document.getElementById('metricCirclePeople').textContent = data.totalCirclePeople;
       document.getElementById('metricWave').textContent = data.waveToday;
-      const langLine = data.languages.map(l => l.language + ': ' + l.c).join(' · ');
-      document.getElementById('metricUsersDelta').textContent = langLine || '';
+      document.getElementById('orbitCirclesNum').textContent = data.totalCircles;
+
+      const langEl = document.getElementById('languagesChart');
+      const total = data.languages.reduce((sum, l) => sum + l.c, 0);
+      if (total === 0) {
+        langEl.innerHTML = '<div class="empty-advice" style="text-align:left">Пока нет данных</div>';
+      } else {
+        const colors = ['var(--wave)', 'var(--priority)', 'var(--purple)', 'var(--green)'];
+        const langNames = { ru: 'Русский', uk: 'Українська', en: 'English', ro: 'Română' };
+        langEl.innerHTML = data.languages.map((l, i) => {
+          const pct = Math.round((l.c / total) * 100);
+          return `
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>${langNames[l.language] || l.language}</span><span style="color:var(--text-faint)">${pct}% (${l.c})</span></div>
+              <div style="height:6px;border-radius:4px;background:rgba(255,255,255,0.06)"><div style="width:${pct}%;height:100%;border-radius:4px;background:${colors[i % colors.length]}"></div></div>
+            </div>
+          `;
+        }).join('');
+      }
     } catch (err) {
       console.warn('Не удалось загрузить дашборд:', err.message);
+    }
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return '';
+    const diffMs = Date.now() - new Date(iso.replace(' ', 'T') + 'Z').getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if (mins < 60) return mins + ' мин назад';
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return hours + ' ч назад';
+    return Math.floor(hours / 24) + ' дн назад';
+  }
+
+  function renderDashboardPreviews() {
+    const ticketsEl = document.getElementById('dashboardTicketsPreview');
+    if (ticketsEl) {
+      const recent = allSupportTickets.slice(0, 3);
+      ticketsEl.innerHTML = recent.length === 0
+        ? '<div class="empty-advice" style="text-align:left">Пока нет обращений</div>'
+        : recent.map(t => `
+          <div class="list-row">
+            <div class="list-avatar">${t.status === 'new' ? '🆕' : t.status === 'in_progress' ? '⏳' : '✓'}</div>
+            <div class="list-body">
+              <div class="list-title">${timeAgo(t.created_at)}</div>
+              <div class="list-sub">${escapeHtmlAdmin((t.message || '').slice(0, 60))}</div>
+            </div>
+          </div>
+        `).join('');
+    }
+  }
+
+  async function loadSuggestionsPreview() {
+    const el = document.getElementById('dashboardSuggestionsPreview');
+    if (!el) return;
+    try {
+      const data = await adminApiFetch('/admin/suggestions');
+      const recent = data.suggestions.slice(0, 3);
+      el.innerHTML = recent.length === 0
+        ? '<div class="empty-advice" style="text-align:left">Пока нет предложений</div>'
+        : recent.map(s => `
+          <div class="list-row">
+            <div class="list-avatar">${(s.user_name || '?')[0]}</div>
+            <div class="list-body">
+              <div class="list-title">${escapeHtmlAdmin(s.user_name || 'Аноним')} <span class="time">${timeAgo(s.created_at)}</span></div>
+              <div class="list-sub">${escapeHtmlAdmin((s.text || '').slice(0, 60))}</div>
+            </div>
+          </div>
+        `).join('');
+    } catch (err) {
+      console.warn('Не удалось загрузить превью предложений:', err.message);
     }
   }
 
@@ -726,6 +697,7 @@
     const newCount = allSupportTickets.filter(t => t.status === 'new').length;
     document.getElementById('supportCountSub').textContent = newCount + ' новых обращений ждут ответа';
     document.querySelector('[data-page="support"] .badge').textContent = newCount;
+    renderDashboardPreviews();
   }
 
   function setSupportFilter(filter) {
@@ -803,7 +775,7 @@
   }
 
   async function loadAllAdminData() {
-    await Promise.all([loadDashboard(), loadUsers(), loadSupportTickets(), loadSuggestions()]);
+    await Promise.all([loadDashboard(), loadUsers(), loadSupportTickets(), loadSuggestions(), loadSuggestionsPreview()]);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
