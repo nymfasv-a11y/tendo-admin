@@ -766,10 +766,23 @@
             <div class="top"><span class="author">${escapeHtmlAdmin(s.user_name || 'Аноним')}</span><span class="time">${formatDateTime(s.created_at)}</span></div>
             <div class="text">${escapeHtmlAdmin(s.text)}</div>
           </div>
+          <button onclick="deleteSuggestion('${s.id}')" style="background:none;border:none;color:var(--text-faint);cursor:pointer;padding:6px;align-self:flex-start" title="Удалить">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6"/></svg>
+          </button>
         </div>
       `).join('');
     } catch (err) {
       console.warn('Не удалось загрузить предложения:', err.message);
+    }
+  }
+
+  async function deleteSuggestion(id) {
+    if (!confirm('Удалить это предложение?')) return;
+    try {
+      await adminApiFetch('/admin/suggestions/' + id, { method: 'DELETE' });
+      loadSuggestions();
+    } catch (err) {
+      console.warn('Не удалось удалить предложение:', err.message);
     }
   }
 
