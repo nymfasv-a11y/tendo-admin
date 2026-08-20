@@ -159,7 +159,8 @@
     font-size: 9.5px; font-weight: 800; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.03em; flex-shrink: 0;
   }
   .status-chip.new { background: rgba(239,95,146,0.15); color: var(--wave); }
-  .status-chip.done { background: rgba(90,200,140,0.15); color: var(--green); }
+  .status-chip.done, .status-chip.resolved { background: rgba(90,200,140,0.15); color: var(--green); }
+  .status-chip.in_progress { background: rgba(240,169,78,0.15); color: #f0a94e; }
 
   .table-panel { grid-column: 1 / -1; }
   table { width: 100%; border-collapse: collapse; }
@@ -670,6 +671,7 @@
   }
 
   function escapeHtmlAdmin(str) {
+    if (str === undefined || str === null) return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
@@ -716,7 +718,7 @@
       <div class="ticket-row" onclick="openTicketDetail('${t.id}')">
         <div class="list-avatar">${t.status === 'new' ? '🆕' : t.status === 'in_progress' ? '⏳' : '✓'}</div>
         <div class="list-body">
-          <div class="list-title">${formatDateTime(t.created_at)}</div>
+          <div class="list-title">${formatDateTime(t.created_at)}${t.admin_reply ? ' · отвечено' : ''}</div>
           <div class="list-sub">${escapeHtmlAdmin((t.message || '').slice(0, 60))}</div>
         </div>
       </div>
@@ -727,17 +729,38 @@
     const t = allSupportTickets.find(x => x.id === id);
     if (!t) return;
     const statusLabels = { new: 'Новое', in_progress: 'В работе', resolved: 'Решено' };
+    const replyBlock = t.admin_reply
+      ? `<div style="margin-top:14px"><div style="font-size:11px;color:var(--text-faint);margin-bottom:6px">Твой ответ (${formatDateTime(t.admin_reply_at)}):</div><div class="bubble" style="background:rgba(139,110,240,0.12)">${escapeHtmlAdmin(t.admin_reply)}</div></div>`
+      : '';
     document.getElementById('ticketDetail').innerHTML = `
       <div class="ticket-detail-head">
         <div><div class="name">Обращение</div><div class="meta">${formatDateTime(t.created_at)}</div></div>
         <span class="status-chip ${t.status}">${statusLabels[t.status]}</span>
       </div>
       <div class="bubble">${escapeHtmlAdmin(t.message)}</div>
+      ${replyBlock}
       <div style="display:flex;gap:8px;margin-top:16px">
         <button class="send-btn" onclick="updateTicketStatus('${t.id}','in_progress')">В работу</button>
         <button class="send-btn" onclick="updateTicketStatus('${t.id}','resolved')">Решено</button>
       </div>
+      <div style="margin-top:16px">
+        <textarea id="replyText_${t.id}" placeholder="${t.admin_reply ? 'Написать новый ответ (заменит текущий)' : 'Написать ответ — пользователь увидит его в приложении'}" style="width:100%;min-height:80px;padding:10px;border-radius:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:13px;resize:vertical"></textarea>
+        <button class="send-btn" style="margin-top:8px;width:100%" onclick="sendTicketReply('${t.id}')">Отправить ответ</button>
+      </div>
     `;
+  }
+
+  async function sendTicketReply(id) {
+    const textarea = document.getElementById('replyText_' + id);
+    const reply = textarea.value.trim();
+    if (!reply) return;
+    try {
+      await adminApiFetch('/admin/support-tickets/' + id + '/reply', { method: 'PUT', body: JSON.stringify({ reply }) });
+      await loadSupportTickets();
+      openTicketDetail(id);
+    } catch (err) {
+      console.warn('Не удалось отправить ответ:', err.message);
+    }
   }
 
   async function updateTicketStatus(id, status) {
