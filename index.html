@@ -629,7 +629,7 @@
       const path = countryFilter ? '/admin/circles?country=' + encodeURIComponent(countryFilter) : '/admin/circles';
       const data = await adminApiFetch(path);
       const circles = data.circles;
-      const filterNote = countryFilter ? ` · только ${countryFilter === 'unknown' ? 'неизвестно' : countryFilter} ${countryFlag(countryFilter)}` : '';
+      const filterNote = countryFilter ? ` · только ${countryFilter === 'unknown' ? 'неизвестно' : escapeHtmlAdmin(countryFilter)} ${countryFlag(countryFilter)}` : '';
       sub.innerHTML = circles.length + ' активных кругов · участников в каждом' + filterNote +
         (countryFilter ? ` <span onclick="openCirclesDetail()" style="cursor:pointer;color:var(--wave);text-decoration:underline">✕ сбросить фильтр</span>` : '');
       if (circles.length === 0) {
