@@ -361,6 +361,42 @@
     </div>
     <div id="adminStatusBanner" style="display:none;margin-top:16px;padding:14px 18px;border-radius:12px;background:rgba(226,75,74,0.12);border:1px solid rgba(226,75,74,0.3);color:#e2504a;font-size:13px"></div>
 
+    <div class="panel" style="margin-top:20px">
+      <div class="panel-head"><h3>Жизненный цикл</h3></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:4px">
+        <div>
+          <div style="font-size:12px;color:var(--text-faint);margin-bottom:10px">Круги</div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:13px;color:var(--text-dim)">Создано всего</span>
+            <span id="lifecycleCirclesCreated" style="font-weight:700">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:13px;color:var(--text-dim)">Удалено</span>
+            <span id="lifecycleCirclesDeleted" style="font-weight:700;color:#e2504a">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0">
+            <span style="font-size:13px;color:var(--text-dim)">Активны сейчас</span>
+            <span id="lifecycleCirclesActive" style="font-weight:700;color:var(--green)">—</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--text-faint);margin-bottom:10px">Люди в кругах</div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:13px;color:var(--text-dim)">Добавлено всего</span>
+            <span id="lifecyclePeopleAdded" style="font-weight:700">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:13px;color:var(--text-dim)">Удалено</span>
+            <span id="lifecyclePeopleDeleted" style="font-weight:700;color:#e2504a">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0">
+            <span style="font-size:13px;color:var(--text-dim)">Активны сейчас</span>
+            <span id="lifecyclePeopleActive" style="font-weight:700;color:var(--green)">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="grid-2">
       <div class="panel">
         <div class="panel-head">
@@ -566,6 +602,15 @@
       document.getElementById('metricCirclePeople').textContent = data.totalCirclePeople;
       document.getElementById('metricWave').textContent = data.waveToday;
       document.getElementById('orbitCirclesNum').textContent = data.totalCircles;
+
+      if (data.lifecycle) {
+        document.getElementById('lifecycleCirclesCreated').textContent = data.lifecycle.circlesCreatedTotal;
+        document.getElementById('lifecycleCirclesDeleted').textContent = data.lifecycle.circlesDeletedTotal;
+        document.getElementById('lifecycleCirclesActive').textContent = data.lifecycle.circlesActive;
+        document.getElementById('lifecyclePeopleAdded').textContent = data.lifecycle.peopleAddedTotal;
+        document.getElementById('lifecyclePeopleDeleted').textContent = data.lifecycle.peopleDeletedTotal;
+        document.getElementById('lifecyclePeopleActive').textContent = data.lifecycle.peopleActive;
+      }
 
       const langEl = document.getElementById('languagesChart');
       const total = data.languages.reduce((sum, l) => sum + l.c, 0);
