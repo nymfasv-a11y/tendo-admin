@@ -401,7 +401,7 @@
       <div class="panel">
         <div class="panel-head">
           <h3>Активность кругов</h3>
-          <span class="link">Подробнее →</span>
+          <span class="link" onclick="openCirclesDetail()" style="cursor:pointer">Подробнее →</span>
         </div>
         <div class="orbit-viz">
           <div class="orbit-ring-el" style="width:170px;height:170px"></div>
@@ -513,9 +513,26 @@
     <div class="panel table-panel">
       <table>
         <thead>
-          <tr><th>Пользователь</th><th>Способ входа</th><th>Дата регистрации</th><th>Согласие получено</th><th>Язык</th></tr>
+          <tr><th>Пользователь</th><th>Способ входа</th><th>Дата регистрации</th><th>Согласие получено</th><th>Язык</th><th>Страна</th></tr>
         </thead>
         <tbody id="usersTableBody">
+          <tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px">Загрузка данных с сервера…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== PAGE: CIRCLES DETAIL ===== -->
+  <div class="page" id="page-circles">
+    <div class="main-head">
+      <div><h1>Круги</h1><div class="sub" id="circlesCountSub">Загрузка… · каждый активный круг с количеством участников</div></div>
+    </div>
+    <div class="panel table-panel">
+      <table>
+        <thead>
+          <tr><th>Владелец</th><th>Участников</th><th>Язык</th><th>Страна</th><th>Круг создан</th></tr>
+        </thead>
+        <tbody id="circlesTableBody">
           <tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px">Загрузка данных с сервера…</td></tr>
         </tbody>
       </table>
@@ -592,6 +609,34 @@
     if (!iso) return '—';
     const d = new Date(iso.replace(' ', 'T') + 'Z');
     return d.toLocaleString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function openCirclesDetail() {
+    showPage('circles');
+    const body = document.getElementById('circlesTableBody');
+    const sub = document.getElementById('circlesCountSub');
+    try {
+      const data = await adminApiFetch('/admin/circles');
+      const circles = data.circles;
+      sub.textContent = circles.length + ' активных кругов · участников в каждом';
+      if (circles.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px">Пока нет активных кругов</td></tr>';
+        return;
+      }
+      const langNames = { ru: 'Русский', uk: 'Українська', en: 'English', ro: 'Română' };
+      body.innerHTML = circles.map(c => `
+        <tr>
+          <td>${escapeHtmlAdmin(c.owner_name || '—')}</td>
+          <td style="font-weight:700">${c.people_count}</td>
+          <td>${langNames[c.language] || c.language || '—'}</td>
+          <td>${escapeHtmlAdmin(c.country || 'неизвестно')}</td>
+          <td style="color:var(--text-faint)">${formatDateTime(c.circle_started_at)}</td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e2504a;padding:24px">Не удалось загрузить</td></tr>';
+      console.warn('Не удалось загрузить круги:', err.message);
+    }
   }
 
   async function loadDashboard() {
@@ -711,6 +756,7 @@
         <td>${formatDateTime(u.created_at)}</td>
         <td style="${u.consent_given_at ? 'color:var(--green)' : 'color:var(--text-faint)'}">${u.consent_given_at ? '✓ ' + formatDateTime(u.consent_given_at) : '— нет'}</td>
         <td>${u.language || '—'}</td>
+        <td>${escapeHtmlAdmin(u.country || 'неизвестно')}</td>
       </tr>
     `).join('');
   }
