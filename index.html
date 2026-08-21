@@ -395,6 +395,10 @@
           </div>
         </div>
       </div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--text-faint);margin-bottom:10px">Круги по странам — нажми, чтобы отфильтровать</div>
+        <div id="lifecycleCountries" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      </div>
     </div>
 
     <div class="grid-2">
@@ -611,14 +615,23 @@
     return d.toLocaleString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
 
-  async function openCirclesDetail() {
+  function countryFlag(code) {
+    if (!code || code === 'unknown' || code.length !== 2) return '🌍';
+    const A = 0x1F1E6;
+    return String.fromCodePoint(...[...code.toUpperCase()].map(c => A + c.charCodeAt(0) - 65));
+  }
+
+  async function openCirclesDetail(countryFilter) {
     showPage('circles');
     const body = document.getElementById('circlesTableBody');
     const sub = document.getElementById('circlesCountSub');
     try {
-      const data = await adminApiFetch('/admin/circles');
+      const path = countryFilter ? '/admin/circles?country=' + encodeURIComponent(countryFilter) : '/admin/circles';
+      const data = await adminApiFetch(path);
       const circles = data.circles;
-      sub.textContent = circles.length + ' активных кругов · участников в каждом';
+      const filterNote = countryFilter ? ` · только ${countryFilter === 'unknown' ? 'неизвестно' : countryFilter} ${countryFlag(countryFilter)}` : '';
+      sub.innerHTML = circles.length + ' активных кругов · участников в каждом' + filterNote +
+        (countryFilter ? ` <span onclick="openCirclesDetail()" style="cursor:pointer;color:var(--wave);text-decoration:underline">✕ сбросить фильтр</span>` : '');
       if (circles.length === 0) {
         body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px">Пока нет активных кругов</td></tr>';
         return;
@@ -629,7 +642,7 @@
           <td>${escapeHtmlAdmin(c.owner_name || '—')}</td>
           <td style="font-weight:700">${c.people_count}</td>
           <td>${langNames[c.language] || c.language || '—'}</td>
-          <td>${escapeHtmlAdmin(c.country || 'неизвестно')}</td>
+          <td>${countryFlag(c.country)} ${escapeHtmlAdmin(c.country || 'неизвестно')}</td>
           <td style="color:var(--text-faint)">${formatDateTime(c.circle_started_at)}</td>
         </tr>
       `).join('');
@@ -655,6 +668,19 @@
         document.getElementById('lifecyclePeopleAdded').textContent = data.lifecycle.peopleAddedTotal;
         document.getElementById('lifecyclePeopleDeleted').textContent = data.lifecycle.peopleDeletedTotal;
         document.getElementById('lifecyclePeopleActive').textContent = data.lifecycle.peopleActive;
+
+        const countriesEl = document.getElementById('lifecycleCountries');
+        if (data.lifecycle.circlesByCountry && data.lifecycle.circlesByCountry.length > 0) {
+          countriesEl.innerHTML = data.lifecycle.circlesByCountry.map(c => `
+            <div onclick="openCirclesDetail('${c.country}')" style="cursor:pointer;display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px" title="Показать круги из этой страны">
+              <span style="font-size:16px">${countryFlag(c.country)}</span>
+              <span style="color:var(--text-dim)">${c.country === 'unknown' ? 'Неизвестно' : c.country}</span>
+              <span style="font-weight:700">${c.c}</span>
+            </div>
+          `).join('');
+        } else {
+          countriesEl.innerHTML = '<div style="color:var(--text-faint);font-size:12px">Пока нет данных по странам</div>';
+        }
       }
 
       const langEl = document.getElementById('languagesChart');
