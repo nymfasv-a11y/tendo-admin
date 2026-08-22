@@ -520,7 +520,7 @@
           <tr><th>Пользователь</th><th>Способ входа</th><th>Дата регистрации</th><th>Согласие получено</th><th>Язык</th><th>Страна</th></tr>
         </thead>
         <tbody id="usersTableBody">
-          <tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px">Загрузка данных с сервера…</td></tr>
+          <tr><td colspan="6" style="text-align:center;color:var(--text-faint);padding:24px">Загрузка данных с сервера…</td></tr>
         </tbody>
       </table>
     </div>
@@ -583,12 +583,12 @@
 
 <script>
   const API_BASE_URL = 'https://tendo-server-production.up.railway.app';
-  let adminPassword = sessionStorage.getItem('tendo_admin_password') || '';
+  let adminToken = sessionStorage.getItem('tendo_admin_token') || '';
   let allSupportTickets = [];
   let currentSupportFilter = 'all';
 
   async function adminApiFetch(path, options = {}) {
-    const headers = { 'Content-Type': 'application/json', 'x-admin-password': adminPassword, ...(options.headers || {}) };
+    const headers = { 'Content-Type': 'application/json', 'x-admin-token': adminToken, ...(options.headers || {}) };
     const res = await fetch(API_BASE_URL + path, { ...options, headers });
     if (res.status === 403) throw new Error('forbidden');
     if (!res.ok) throw new Error('API error ' + res.status);
@@ -597,11 +597,19 @@
 
   async function adminLogin() {
     const input = document.getElementById('adminPasswordInput');
-    adminPassword = input.value;
+    const password = input.value;
     const errorEl = document.getElementById('adminLoginError');
     try {
-      await adminApiFetch('/admin/dashboard');
-      sessionStorage.setItem('tendo_admin_password', adminPassword);
+      const res = await fetch(API_BASE_URL + '/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      if (!res.ok) throw new Error('invalid password');
+      const data = await res.json();
+      adminToken = data.token;
+      sessionStorage.setItem('tendo_admin_token', adminToken);
+      input.value = ''; // сам пароль нигде больше не хранится и не нужен
       document.getElementById('adminLoginOverlay').style.display = 'none';
       loadAllAdminData();
     } catch (err) {
@@ -763,7 +771,7 @@
       document.getElementById('usersCountSub').textContent = allUsers.length + ' пользователей · согласие с политикой отслеживается для каждого';
       renderUsersTable();
     } catch (err) {
-      document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px">Не удалось загрузить</td></tr>';
+      document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-faint);padding:24px">Не удалось загрузить</td></tr>';
     }
   }
 
@@ -772,7 +780,7 @@
     const filtered = allUsers.filter(u => (u.name || '').toLowerCase().includes(search) || (u.email || '').toLowerCase().includes(search));
     const body = document.getElementById('usersTableBody');
     if (filtered.length === 0) {
-      body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:24px">Никого не найдено</td></tr>';
+      body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-faint);padding:24px">Никого не найдено</td></tr>';
       return;
     }
     body.innerHTML = filtered.map(u => `
@@ -969,12 +977,12 @@
     checkServerHealth();
     const dateEl = document.getElementById('dashboardDateSub');
     if (dateEl) dateEl.textContent = 'Обзор активности — ' + new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-    if (adminPassword) {
+    if (adminToken) {
       adminApiFetch('/admin/dashboard').then(() => {
         document.getElementById('adminLoginOverlay').style.display = 'none';
         loadAllAdminData();
       }).catch(() => {
-        sessionStorage.removeItem('tendo_admin_password');
+        sessionStorage.removeItem('tendo_admin_token');
       });
     }
   });
@@ -997,16 +1005,27 @@
   }
 
   async function toggleMonetization() {
-    const checked = document.getElementById('monetizationToggle').checked;
+    const checkbox = document.getElementById('monetizationToggle');
+    const checked = checkbox.checked;
+    const previousChecked = !checked; // состояние до переключения — на случай отката
     const pill = document.getElementById('monetizationStatus');
     const text = document.getElementById('monetizationStatusText');
-    pill.classList.toggle('on', checked);
-    pill.classList.toggle('off', !checked);
-    text.textContent = checked ? 'Активно для всех' : 'Выключено — действует лимит 5 человек';
+
+    function applyVisualState(isOn) {
+      pill.classList.toggle('on', isOn);
+      pill.classList.toggle('off', !isOn);
+      text.textContent = isOn ? 'Активно для всех' : 'Выключено — действует лимит 5 человек';
+    }
+
+    applyVisualState(checked);
     try {
       await adminApiFetch('/admin/settings/premium_free_for_all', { method: 'PUT', body: JSON.stringify({ value: checked }) });
     } catch (err) {
       console.warn('Не удалось сохранить настройку на сервере:', err.message);
+      // Откатываем визуальное состояние обратно — сервер не подтвердил изменение
+      checkbox.checked = previousChecked;
+      applyVisualState(previousChecked);
+      text.textContent += ' — не сохранилось, попробуй ещё раз';
     }
   }
 </script>
